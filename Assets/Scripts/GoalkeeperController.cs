@@ -3,7 +3,7 @@ using UnityEngine;
 public class GoalkeeperController : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 2f;
+    public float moveSpeed = 3.5f;
     public float moveRange = 2.5f;
 
     [Header("Sprites")]
