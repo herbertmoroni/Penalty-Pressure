@@ -8,7 +8,7 @@ public class BallController : MonoBehaviour
     public Transform goalGuide;
 
     [Header("Settings")]
-    public float shootSpeed       = 14f;
+    public float shootSpeed       = 20f;
     public float minDragDistance  = 0.3f;
     public float ballDragRadius   = 1.0f;
     public float keeperSaveDistance = 1.2f;

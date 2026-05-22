@@ -3,8 +3,9 @@ using UnityEngine;
 public class GoalkeeperController : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 3.5f;
-    public float moveRange = 2.5f;
+    public float minMoveSpeed = 3f;
+    public float maxMoveSpeed = 7f;
+    public float moveRange    = 2.5f;
 
     [Header("Sprites")]
     public Sprite idle1;
@@ -17,17 +18,15 @@ public class GoalkeeperController : MonoBehaviour
     private bool showingIdle1 = true;
     private bool isSaved;
 
-    // Patrol: center(0) → left → center(0) → right → repeat
-    private float[] waypoints;
-    private int waypointIndex;
+    private float targetX;
+    private float currentSpeed;
 
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
-        waypoints = new float[] { 0f, -moveRange, 0f, moveRange };
-        waypointIndex = 0;
         transform.position = new Vector3(0f, transform.position.y, 0f);
         sr.sprite = idle1;
+        PickNewTarget();
     }
 
     void Update()
@@ -37,17 +36,22 @@ public class GoalkeeperController : MonoBehaviour
         AnimateSprite();
     }
 
+    void PickNewTarget()
+    {
+        targetX      = Random.Range(-moveRange, moveRange);
+        currentSpeed = Random.Range(minMoveSpeed, maxMoveSpeed);
+    }
+
     void Patrol()
     {
-        float targetX = waypoints[waypointIndex];
         transform.position = Vector3.MoveTowards(
             transform.position,
             new Vector3(targetX, transform.position.y, 0f),
-            moveSpeed * Time.deltaTime
+            currentSpeed * Time.deltaTime
         );
 
         if (Mathf.Abs(transform.position.x - targetX) < 0.05f)
-            waypointIndex = (waypointIndex + 1) % waypoints.Length;
+            PickNewTarget();
     }
 
     void AnimateSprite()
@@ -55,25 +59,25 @@ public class GoalkeeperController : MonoBehaviour
         spriteTimer += Time.deltaTime;
         if (spriteTimer >= spriteSwapInterval)
         {
-            spriteTimer = 0f;
+            spriteTimer  = 0f;
             showingIdle1 = !showingIdle1;
-            sr.sprite = showingIdle1 ? idle1 : idle2;
+            sr.sprite    = showingIdle1 ? idle1 : idle2;
         }
     }
 
     public void ShowSaved()
     {
-        isSaved = true;
+        isSaved   = true;
         sr.sprite = saved;
     }
 
     public void ResetKeeper()
     {
-        isSaved = false;
+        isSaved      = false;
         showingIdle1 = true;
-        spriteTimer = 0f;
-        waypointIndex = 0;
+        spriteTimer  = 0f;
         transform.position = new Vector3(0f, transform.position.y, 0f);
         sr.sprite = idle1;
+        PickNewTarget();
     }
 }
