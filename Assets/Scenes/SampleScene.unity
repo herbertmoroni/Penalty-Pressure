@@ -229,14 +229,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallController
   goalGuide: {fileID: 2145456072}
-  minShootSpeed: 8
-  maxShootSpeed: 20
-  maxPowerDrag: 3
+  shootSpeed: 8
   minDragDistance: 0.5
-  ballDragRadius: 0.8
+  ballDragRadius: 1
   keeperSaveDistance: 1.2
+  maxPowerDrag: 2.5
+  xSensitivity: 2.5
   goalText: {fileID: 1818789036}
   goalSound: {fileID: 0}
+  groanSound: {fileID: 0}
+  backgroundMusic: {fileID: 0}
   goalkeeper: {fileID: 455913246}
 --- !u!212 &246468612
 SpriteRenderer:
@@ -416,7 +418,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d398bc5b48b6054b958119fb9e4de7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GoalkeeperController
-  moveSpeed: 2
+  minMoveSpeed: 3
+  maxMoveSpeed: 7
   moveRange: 2.5
   idle1: {fileID: 4821499735090501366, guid: e849fb1929d59674db0cbfc8508640c4, type: 3}
   idle2: {fileID: 1295375760118286184, guid: f583182ebb9d1c940b263bfd1ee2a20b, type: 3}
@@ -990,7 +993,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &2145456071
 SpriteRenderer:
   serializedVersion: 2
@@ -1059,8 +1062,8 @@ Transform:
   m_GameObject: {fileID: 2145456070}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0152, y: 0.6655, z: 0}
-  m_LocalScale: {x: 10.463278, y: 3.8292623, z: 1}
+  m_LocalPosition: {x: 0.0152, y: 0.7365, z: 0}
+  m_LocalScale: {x: 10.690505, y: 3.9713278, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

@@ -20,6 +20,7 @@ public class GoalkeeperController : MonoBehaviour
 
     private float targetX;
     private float currentSpeed;
+    private bool isFrozen;
 
     void Start()
     {
@@ -31,7 +32,7 @@ public class GoalkeeperController : MonoBehaviour
 
     void Update()
     {
-        if (isSaved) return;
+        if (isSaved || isFrozen) return;
         Patrol();
         AnimateSprite();
     }
@@ -65,6 +66,8 @@ public class GoalkeeperController : MonoBehaviour
         }
     }
 
+    public void Freeze() { isFrozen = true; }
+
     public void ShowSaved()
     {
         isSaved   = true;
@@ -74,6 +77,7 @@ public class GoalkeeperController : MonoBehaviour
     public void ResetKeeper()
     {
         isSaved      = false;
+        isFrozen     = false;
         showingIdle1 = true;
         spriteTimer  = 0f;
         transform.position = new Vector3(0f, transform.position.y, 0f);

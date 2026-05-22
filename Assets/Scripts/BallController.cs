@@ -8,18 +8,20 @@ public class BallController : MonoBehaviour
     public Transform goalGuide;
 
     [Header("Settings")]
-    public float shootSpeed       = 20f;
-    public float minDragDistance  = 0.3f;
-    public float ballDragRadius   = 1.0f;
+    public float shootSpeed         = 20f;
+    public float minDragDistance    = 0.3f;
+    public float ballDragRadius     = 1.0f;
     public float keeperSaveDistance = 1.2f;
-    public float maxPowerDrag     = 2.5f;   // drag Y distance that maps to crossbar height
-    public float xSensitivity     = 2.5f;   // multiplier for left/right aim
+    public float maxPowerDrag       = 2.5f;
+    public float xSensitivity       = 2.5f;
 
     [Header("UI")]
     public TextMeshProUGUI goalText;
 
     [Header("Audio")]
-    public AudioSource goalSound;
+    public AudioClip goalClip;
+    public AudioClip groanClip;
+    public AudioClip musicClip;
 
     [Header("References")]
     public GoalkeeperController goalkeeper;
@@ -39,11 +41,24 @@ public class BallController : MonoBehaviour
     private SpriteRenderer ballRenderer;
     private Vector3 originalScale;
 
+    private AudioSource sfxSource;
+    private AudioSource musicSource;
+
     void Start()
     {
         startPosition = transform.position;
         originalScale = transform.localScale;
         ballRenderer  = GetComponent<SpriteRenderer>();
+
+        sfxSource   = gameObject.AddComponent<AudioSource>();
+        musicSource = gameObject.AddComponent<AudioSource>();
+
+        if (musicClip != null)
+        {
+            musicSource.clip = musicClip;
+            musicSource.loop = true;
+            musicSource.Play();
+        }
 
         if (goalText != null)
             goalText.gameObject.SetActive(false);
@@ -80,7 +95,6 @@ public class BallController : MonoBehaviour
         {
             transform.position += shotDirection * shootSpeed * Time.deltaTime;
 
-            // Shrink ball as it travels toward goal (perspective illusion)
             float progress = Mathf.InverseLerp(startPosition.y, finalTarget.y, transform.position.y);
             transform.localScale = originalScale * Mathf.Lerp(1f, 0.6f, progress);
 
@@ -112,7 +126,6 @@ public class BallController : MonoBehaviour
 
             if (dragVector.magnitude > minDragDistance && dragVector.y > 0)
             {
-                // Y drag = power → height in goal. 1.4x multiplier lets max drag overshoot crossbar
                 float dragPower = dragVector.y / maxPowerDrag;
                 float aimX = transform.position.x + dragVector.x * xSensitivity;
                 float aimY = goalYBottom + dragPower * (goalYTop - goalYBottom) * 1.4f;
@@ -147,6 +160,7 @@ public class BallController : MonoBehaviour
                 ? (ballX < goalXLeft ? "wide left" : "wide right")
                 : (ballY < goalYBottom ? "below goal" : "over crossbar");
             Debug.Log($"[MISS] {reason}");
+            if (groanClip != null) sfxSource.PlayOneShot(groanClip);
             StartCoroutine(ResetAfterDelay(0.5f));
             return;
         }
@@ -154,6 +168,7 @@ public class BallController : MonoBehaviour
         if (Mathf.Abs(ballX - keeperX) < keeperSaveDistance)
         {
             Debug.Log($"[SAVED] keeper={keeperX:F3}  ball={ballX:F3}");
+            if (groanClip != null) sfxSource.PlayOneShot(groanClip);
             goalkeeper.ShowSaved();
             ballRenderer.enabled = false;
             StartCoroutine(WaitForClick());
@@ -167,7 +182,8 @@ public class BallController : MonoBehaviour
 
     IEnumerator GoalSequence()
     {
-        if (goalSound != null) goalSound.Play();
+        goalkeeper.Freeze();
+        if (goalClip != null) sfxSource.PlayOneShot(goalClip);
 
         if (goalText != null)
         {
@@ -185,7 +201,7 @@ public class BallController : MonoBehaviour
             goalText.transform.localScale = Vector3.one;
         }
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(8.55f); // 9s total (0.45s already elapsed)
 
         if (goalText != null)
         {
