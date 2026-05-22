@@ -7,15 +7,13 @@ public class BallController : MonoBehaviour
     [Header("Goal Guide")]
     public Transform goalGuide;
 
-    [Header("Speed")]
-    public float minShootSpeed = 5f;
-    public float maxShootSpeed = 12f;
-    public float maxPowerDrag  = 3f;
-
     [Header("Settings")]
-    public float minDragDistance    = 0.3f;
-    public float ballDragRadius     = 1.0f;
+    public float shootSpeed       = 8f;
+    public float minDragDistance  = 0.3f;
+    public float ballDragRadius   = 1.0f;
     public float keeperSaveDistance = 1.2f;
+    public float maxPowerDrag     = 2.5f;   // drag Y distance that maps to crossbar height
+    public float xSensitivity     = 2.5f;   // multiplier for left/right aim
 
     [Header("UI")]
     public TextMeshProUGUI goalText;
@@ -26,16 +24,18 @@ public class BallController : MonoBehaviour
     [Header("References")]
     public GoalkeeperController goalkeeper;
 
-    private float goalLineY;
+    private float goalYBottom;
+    private float goalYTop;
     private float goalXLeft;
     private float goalXRight;
 
     private Vector3 startPosition;
+    private Vector3 dragStart;
+    private Vector3 finalTarget;
     private bool isDragging;
     private bool isShot;
     private bool isResetting;
     private Vector3 shotDirection;
-    private float currentSpeed;
     private SpriteRenderer ballRenderer;
     private Vector3 originalScale;
 
@@ -55,32 +55,40 @@ public class BallController : MonoBehaviour
     {
         if (goalGuide == null)
         {
-            Debug.LogWarning("BallController: goalGuide not assigned.");
-            goalLineY  = 1.5f;
-            goalXLeft  = -5f;
-            goalXRight =  5f;
+            Debug.LogWarning("BallController: goalGuide not assigned — using fallback bounds.");
+            goalYBottom = -1.249f;
+            goalYTop    =  2.722f;
+            goalXLeft   = -5.216f;
+            goalXRight  =  5.247f;
             return;
         }
 
-        goalLineY  = goalGuide.position.y - Mathf.Abs(goalGuide.lossyScale.y) * 0.5f;
-        goalXLeft  = goalGuide.position.x - Mathf.Abs(goalGuide.lossyScale.x) * 0.5f;
-        goalXRight = goalGuide.position.x + Mathf.Abs(goalGuide.lossyScale.x) * 0.5f;
+        float halfH = Mathf.Abs(goalGuide.lossyScale.y) * 0.5f;
+        float halfW = Mathf.Abs(goalGuide.lossyScale.x) * 0.5f;
 
-        Debug.Log($"Ball Y={startPosition.y:F3} | goalLineY={goalLineY:F3}  X=[{goalXLeft:F3}, {goalXRight:F3}]");
+        goalYBottom = goalGuide.position.y - halfH;
+        goalYTop    = goalGuide.position.y + halfH;
+        goalXLeft   = goalGuide.position.x - halfW;
+        goalXRight  = goalGuide.position.x + halfW;
+
+        Debug.Log($"[Setup] Goal X=[{goalXLeft:F3}, {goalXRight:F3}]  Y=[{goalYBottom:F3}, {goalYTop:F3}]  Ball Y={startPosition.y:F3}");
     }
 
     void Update()
     {
         if (isShot)
         {
-            transform.position += shotDirection * currentSpeed * Time.deltaTime;
+            transform.position += shotDirection * shootSpeed * Time.deltaTime;
 
-            // Shrink ball as it travels forward
-            float t = Mathf.InverseLerp(startPosition.y, goalLineY, transform.position.y);
-            transform.localScale = originalScale * Mathf.Lerp(1f, 0.6f, t);
+            // Shrink ball as it travels toward goal (perspective illusion)
+            float progress = Mathf.InverseLerp(startPosition.y, finalTarget.y, transform.position.y);
+            transform.localScale = originalScale * Mathf.Lerp(1f, 0.6f, progress);
 
-            if (!isResetting && transform.position.y >= goalLineY)
+            if (!isResetting && transform.position.y >= finalTarget.y)
+            {
+                transform.position = finalTarget;
                 CheckGoalOrSave();
+            }
 
             return;
         }
@@ -89,23 +97,31 @@ public class BallController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (Vector3.Distance(GetMouseWorldPos(), transform.position) <= ballDragRadius)
+            Vector3 mouseWorld = GetMouseWorldPos();
+            if (Vector3.Distance(mouseWorld, transform.position) <= ballDragRadius)
+            {
+                dragStart  = mouseWorld;
                 isDragging = true;
+            }
         }
 
         if (Input.GetMouseButtonUp(0) && isDragging)
         {
             isDragging = false;
-            Vector3 toMouse = GetMouseWorldPos() - transform.position;
-            if (toMouse.magnitude > minDragDistance && toMouse.y > 0)
-            {
-                // Horizontal drag controls left/right aim — ball always travels toward the goal
-                float aimX    = Mathf.Clamp(transform.position.x + toMouse.x * 2f, goalXLeft, goalXRight);
-                Vector3 target = new Vector3(aimX, goalLineY, 0f);
-                shotDirection  = (target - transform.position).normalized;
+            Vector3 dragVector = GetMouseWorldPos() - dragStart;
 
-                float power   = Mathf.Clamp01(toMouse.magnitude / maxPowerDrag);
-                currentSpeed  = Mathf.Lerp(minShootSpeed, maxShootSpeed, power);
+            if (dragVector.magnitude > minDragDistance && dragVector.y > 0)
+            {
+                // Y drag = power → height in goal. 1.4x multiplier lets max drag overshoot crossbar
+                float dragPower = dragVector.y / maxPowerDrag;
+                float aimX = transform.position.x + dragVector.x * xSensitivity;
+                float aimY = goalYBottom + dragPower * (goalYTop - goalYBottom) * 1.4f;
+
+                finalTarget   = new Vector3(aimX, aimY, 0f);
+                shotDirection = (finalTarget - transform.position).normalized;
+
+                Debug.Log($"[Shot] power={dragPower:F2}  aimX={aimX:F3}  aimY={aimY:F3}");
+
                 isShot = true;
             }
         }
@@ -114,31 +130,37 @@ public class BallController : MonoBehaviour
     void CheckGoalOrSave()
     {
         isResetting = true;
-        isShot = false;
+        isShot      = false;
 
         float ballX   = transform.position.x;
+        float ballY   = transform.position.y;
         float keeperX = goalkeeper.transform.position.x;
 
-        // Wide — outside the posts
-        if (ballX < goalXLeft || ballX > goalXRight)
+        bool inX = ballX >= goalXLeft  && ballX <= goalXRight;
+        bool inY = ballY >= goalYBottom && ballY <= goalYTop;
+
+        Debug.Log($"[Check] ball=({ballX:F3},{ballY:F3})  inX={inX} inY={inY}  keeperX={keeperX:F3}  keeperDiff={Mathf.Abs(ballX - keeperX):F3}");
+
+        if (!inX || !inY)
         {
-            Debug.Log($"WIDE — ball X={ballX:F3}");
-            isShot = false;
-            StartCoroutine(WaitForClick());
+            string reason = !inX
+                ? (ballX < goalXLeft ? "wide left" : "wide right")
+                : (ballY < goalYBottom ? "below goal" : "over crossbar");
+            Debug.Log($"[MISS] {reason}");
+            StartCoroutine(ResetAfterDelay(0.5f));
             return;
         }
 
-        Debug.Log($"ON TARGET — ball X={ballX:F3}  keeper X={keeperX:F3}");
-
         if (Mathf.Abs(ballX - keeperX) < keeperSaveDistance)
         {
+            Debug.Log($"[SAVED] keeper={keeperX:F3}  ball={ballX:F3}");
             goalkeeper.ShowSaved();
             ballRenderer.enabled = false;
-            isShot = false;
             StartCoroutine(WaitForClick());
         }
         else
         {
+            Debug.Log($"[GOAL] ball=({ballX:F3},{ballY:F3})  keeper={keeperX:F3}");
             StartCoroutine(GoalSequence());
         }
     }
@@ -177,9 +199,15 @@ public class BallController : MonoBehaviour
 
     IEnumerator WaitForClick()
     {
-        // Ball stops wherever it is — click anywhere to reset
         yield return null;
         yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
+        ResetBall();
+        goalkeeper.ResetKeeper();
+    }
+
+    IEnumerator ResetAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
         ResetBall();
         goalkeeper.ResetKeeper();
     }
@@ -193,7 +221,7 @@ public class BallController : MonoBehaviour
 
     void ResetBall()
     {
-        transform.position = startPosition;
+        transform.position   = startPosition;
         transform.localScale = originalScale;
         ballRenderer.enabled = true;
         isShot      = false;
