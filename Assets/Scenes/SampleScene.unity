@@ -236,9 +236,9 @@ MonoBehaviour:
   maxPowerDrag: 2.5
   xSensitivity: 2.5
   goalText: {fileID: 1818789036}
-  goalSound: {fileID: 0}
-  groanSound: {fileID: 0}
-  backgroundMusic: {fileID: 0}
+  goalClip: {fileID: 8300000, guid: 3c35cdf181248144aa6d1e7d98c05883, type: 3}
+  groanClip: {fileID: 8300000, guid: 46e600a27c89cbc4fba46af81a192e00, type: 3}
+  musicClip: {fileID: 8300000, guid: 85679fe45080efa4996f23a172d758f3, type: 3}
   goalkeeper: {fileID: 455913246}
 --- !u!212 &246468612
 SpriteRenderer:
