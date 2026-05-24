@@ -50,6 +50,8 @@ public class BallController : MonoBehaviour
         originalScale = transform.localScale;
         ballRenderer  = GetComponent<SpriteRenderer>();
 
+        // AudioClip fields let us drag audio files directly from Project; AudioSources are
+        // created here so the Inspector doesn't require pre-wiring component references
         sfxSource   = gameObject.AddComponent<AudioSource>();
         musicSource = gameObject.AddComponent<AudioSource>();
 
@@ -78,6 +80,7 @@ public class BallController : MonoBehaviour
             return;
         }
 
+        // lossyScale gives world-space scale and is readable even when goalGuide is disabled
         float halfH = Mathf.Abs(goalGuide.lossyScale.y) * 0.5f;
         float halfW = Mathf.Abs(goalGuide.lossyScale.x) * 0.5f;
 
@@ -95,6 +98,7 @@ public class BallController : MonoBehaviour
         {
             transform.position += shotDirection * shootSpeed * Time.deltaTime;
 
+            // Shrink from 100% → 60% as the ball travels forward, simulating depth in a 2D scene
             float progress = Mathf.InverseLerp(startPosition.y, finalTarget.y, transform.position.y);
             transform.localScale = originalScale * Mathf.Lerp(1f, 0.6f, progress);
 
@@ -128,6 +132,7 @@ public class BallController : MonoBehaviour
             {
                 float dragPower = dragVector.y / maxPowerDrag;
                 float aimX = transform.position.x + dragVector.x * xSensitivity;
+                // 1.4 allows a full-power drag to overshoot the crossbar; dragPower > ~0.71 = over bar
                 float aimY = goalYBottom + dragPower * (goalYTop - goalYBottom) * 1.4f;
 
                 finalTarget   = new Vector3(aimX, aimY, 0f);
@@ -165,6 +170,8 @@ public class BallController : MonoBehaviour
             return;
         }
 
+        // X-only comparison: in a front-view penalty kick, keepers dive left or right —
+        // height doesn't affect whether they reach the ball, so only horizontal distance matters
         if (Mathf.Abs(ballX - keeperX) < keeperSaveDistance)
         {
             Debug.Log($"[SAVED] keeper={keeperX:F3}  ball={ballX:F3}");
@@ -215,6 +222,7 @@ public class BallController : MonoBehaviour
 
     IEnumerator WaitForClick()
     {
+        // Skip one frame so the mouse-up that triggered the save doesn't immediately reset
         yield return null;
         yield return new WaitUntil(() => Input.GetMouseButtonDown(0));
         ResetBall();

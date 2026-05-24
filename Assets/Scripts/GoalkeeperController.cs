@@ -37,6 +37,7 @@ public class GoalkeeperController : MonoBehaviour
         AnimateSprite();
     }
 
+    // Random destination and speed each move — prevents the player from timing the keeper
     void PickNewTarget()
     {
         targetX      = Random.Range(-moveRange, moveRange);
