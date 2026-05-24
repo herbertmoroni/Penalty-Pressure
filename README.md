@@ -1,30 +1,39 @@
 # Overview
 
-{Important!  Do not say in this section that this is college assignment.  Talk about what you are trying to accomplish as a software engineer to further your learning.}
+As a software engineer, I'm always looking for ways to deepen my understanding of game development, event-driven programming, and real-time interaction. Building **PenaltyPressure** gave me hands-on experience with Unity's 2D rendering pipeline, C# game logic, physics-free kinematic movement, and audio integration — all areas I wanted to grow in.
 
-{Provide a description the game that you wrote. Describe how to play your game.}
+**PenaltyPressure** is a front-view 2D soccer penalty kick game. You play as the shooter facing the goal, with an AI goalkeeper defending it.
 
-{Describe your purpose for writing this software.}
-
-{Provide a link to your YouTube demonstration.  It should be a 4-5 minute demo of the game being played and a walkthrough of the code.}
+How to play:
+- Click and hold on the ball, then drag upward to shoot
+- Drag **left or right** to aim your shot toward that side of the goal
+- Drag **further up** for more power — a short drag shoots low, a long drag shoots high, but too much power sends it over the crossbar
+- The goalkeeper patrols the goal at random speeds and directions — time your shot to beat them
+- Score a goal and the crowd cheers for 9 seconds before the next kick
+- Get saved or shoot wide and the crowd groans — click anywhere to try again
 
 [Software Demo Video](http://youtube.link.goes.here)
 
 # Development Environment
 
-{Describe the tools that you used to develop the software}
-
-{Describe the programming language that you used and any libraries.}
+- **Unity 6** (6000.4.6f1) — game engine and editor
+- **Visual Studio / VS Code** — C# script editing
+- **C#** — primary programming language, using Unity's MonoBehaviour framework
+- **TextMesh Pro** — animated in-game UI text (GOAAALLLL! celebration)
+- **Universal Render Pipeline (URP) 2D** — 2D sprite rendering
+- **Unity Audio system** — AudioClip and AudioSource for crowd sounds and background music
 
 # Useful Websites
 
-{Make a list of websites that you found helpful in this project}
-* [Web Site Name](http://url.link.goes.here)
-* [Web Site Name](http://url.link.goes.here)
+* [Unity Documentation](https://docs.unity3d.com)
+* [TextMesh Pro Documentation](https://docs.unity3d.com/Packages/com.unity.textmeshpro@latest)
+* [Unity AudioSource API](https://docs.unity3d.com/ScriptReference/AudioSource.html)
+* [Game Inspiration — Grimace Penalty Soccer Challenge](https://www.filereadynow.com/blog/grimace-penalty-soccer-challenge-thats-hard-to-resist)
 
 # Future Work
 
-{Make a list of things that you need to fix, improve, and add in the future.}
-* Item 1
-* Item 2
-* Item 3
+* Add a score counter to track goals across multiple kicks in a session
+* Show miss/save feedback text on screen (e.g. "SAVED!" or "WIDE!")
+* Add a visual drag indicator while aiming to help players understand shot direction and power
+* Add mobile touch input support
+* Add sound volume controls
