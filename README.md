@@ -21,6 +21,19 @@ How to play:
 - **Universal Render Pipeline (URP) 2D** — 2D sprite rendering
 - **Unity Audio system** — AudioClip and AudioSource for crowd sounds and background music
 
+# How to Run
+
+**Requirements:**
+- Unity Hub
+- Unity 6 (6000.4.6f1)
+
+**Steps:**
+1. Clone the repository
+2. Open Unity Hub → Add → Add project from disk → select the cloned folder
+3. Wait for Unity to reimport assets (first open takes a few minutes)
+4. Open `Assets/Scenes/SampleScene`
+5. Press the ▶ Play button to run the game
+
 # Useful Websites
 
 * [Unity Documentation](https://docs.unity3d.com)
@@ -35,3 +48,8 @@ How to play:
 * Add a visual drag indicator while aiming to help players understand shot direction and power
 * Add mobile touch input support
 * Add sound volume controls
+
+# AI Disclosure
+This project used AI assistance in the following ways:
+- Claude assisted with Unity Editor workflow — organizing assets, connecting GameObjects, configuring components, and understanding how Unity concepts like serialized fields, sprite swapping, and AudioSource work
+- ChatGPT generated all game art assets (background, goalkeeper sprites, ball)
