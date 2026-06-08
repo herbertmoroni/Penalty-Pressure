@@ -1,7 +1,5 @@
 # Overview
 
-As a software engineer, I'm always looking for ways to deepen my understanding of game development, event-driven programming, and real-time interaction. Building **PenaltyPressure** gave me hands-on experience with Unity's 2D rendering pipeline, C# game logic, physics-free kinematic movement, and audio integration — all areas I wanted to grow in.
-
 **PenaltyPressure** is a front-view 2D soccer penalty kick game. You play as the shooter facing the goal, with an AI goalkeeper defending it.
 
 How to play:
