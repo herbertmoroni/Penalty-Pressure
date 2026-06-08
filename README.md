@@ -10,7 +10,7 @@ How to play:
 - Score a goal and the crowd cheers for 9 seconds before the next kick
 - Get saved or shoot wide and the crowd groans — click anywhere to try again
 
-[Software Demo Video](http://youtube.link.goes.here)
+[Software Demo Video](https://youtu.be/rGxh2LF2YyA)
 
 # Development Environment
 
