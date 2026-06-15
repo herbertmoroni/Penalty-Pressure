@@ -43,7 +43,8 @@ How to play:
 
 # Future Work
 
-* Add a score counter to track goals across multiple kicks in a session
+* Add a 3-miss game over system with a local leaderboard where players enter their name after the match — top 10 saved locally for friendly competition
+* Refactor audio and UI responsibilities out of BallController into dedicated AudioManager and ScoreManager classes to improve separation of concerns
 * Show miss/save feedback text on screen (e.g. "SAVED!" or "WIDE!")
 * Add a visual drag indicator while aiming to help players understand shot direction and power
 * Add mobile touch input support
