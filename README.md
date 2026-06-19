@@ -1,56 +1,56 @@
 # Overview
 
-**PenaltyPressure** is a front-view 2D soccer penalty kick game. You play as the shooter facing the goal, with an AI goalkeeper defending it.
+A GIS investigation map that visualizes 112 phone call records from a real CDR (Call Detail Record) dataset across 6 cell tower sites in São Paulo, Brazil. CDR data is used by investigators to reconstruct the physical movement and communication patterns of persons of interest — this map makes those patterns visible at a glance.
 
-How to play:
-- Click and hold on the ball, then drag upward to shoot
-- Drag **left or right** to aim your shot toward that side of the goal
-- Drag **further up** for more power — a short drag shoots low, a long drag shoots high, but too much power sends it over the crossbar
-- The goalkeeper patrols the goal at random speeds and directions — time your shot to beat them
-- Score a goal and the crowd cheers for 9 seconds before the next kick
-- Get saved or shoot wide and the crowd groans — click anywhere to try again
+Each marker represents a single call event, placed inside the antenna sector that handled it. Markers cluster at low zoom and split into individual call events as you zoom in. A heatmap toggle shows call density by tower.
 
-[Software Demo Video](https://youtu.be/rGxh2LF2YyA)
+**How to use:**
+- Zoom in to split clusters into individual call markers
+- Click any marker for full call details: origin, destination, date, time, duration, and tower
+- Click any tower icon for station ID, address, and total calls handled
+- Click any sector wedge for azimuth, radius, and call count
+- Use **🔥 Show Heatmap** to switch between markers and density view
+- Use **📡 Hide Sectors** to toggle antenna coverage wedges
+
+**Why clustering:** All 112 calls map to only 6 tower coordinates — without clustering, every marker would stack invisibly on the same 6 points. ArcGIS native `featureReduction` groups them automatically and splits on zoom.
+
+![CDR Map](images/demo.png)
+
+[Software Demo Video](http://youtube.link.goes.here)
 
 # Development Environment
 
-- **Unity 6** (6000.4.6f1) — game engine and editor
-- **Visual Studio / VS Code** — C# script editing
-- **C#** — primary programming language, using Unity's MonoBehaviour framework
-- **TextMesh Pro** — animated in-game UI text (GOAAALLLL! celebration)
-- **Universal Render Pipeline (URP) 2D** — 2D sprite rendering
-- **Unity Audio system** — AudioClip and AudioSource for crowd sounds and background music
+- VS Code with [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension
+- Vanilla JavaScript (ES Modules — no framework, no build tool)
+- [ArcGIS Maps SDK for JavaScript 5.0](https://developers.arcgis.com/javascript/latest/) via CDN
 
-# How to Run
+**How to run:**
 
-**Requirements:**
-- Unity Hub
-- Unity 6 (6000.4.6f1)
-
-**Steps:**
 1. Clone the repository
-2. Open Unity Hub → Add → Add project from disk → select the cloned folder
-3. Wait for Unity to reimport assets (first open takes a few minutes)
-4. Open `Assets/Scenes/SampleScene`
-5. Press the ▶ Play button to run the game
+2. Copy `js/config.example.js` to `js/config.js` and paste your free ArcGIS API key from [developers.arcgis.com](https://developers.arcgis.com)
+3. Open the project root in VS Code and click **Go Live**
+4. Open `http://localhost:5500` in your browser
+
+> The project must be served from the **project root folder** — ES modules don't load over `file://`.
+
+No install steps, no build process.
 
 # Useful Websites
 
-* [Unity Documentation](https://docs.unity3d.com)
-* [TextMesh Pro Documentation](https://docs.unity3d.com/Packages/com.unity.textmeshpro@latest)
-* [Unity AudioSource API](https://docs.unity3d.com/ScriptReference/AudioSource.html)
-* [Game Inspiration — Grimace Penalty Soccer Challenge](https://www.filereadynow.com/blog/grimace-penalty-soccer-challenge-thats-hard-to-resist)
+* [ArcGIS Maps SDK for JavaScript — API Reference](https://developers.arcgis.com/javascript/latest/api-reference/)
+* [GeoJSONLayer Documentation](https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-GeoJSONLayer.html)
+* [FeatureReduction Clustering](https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-support-FeatureReductionCluster.html)
+* [Get a free ArcGIS API key](https://developers.arcgis.com/)
 
 # Future Work
 
-* Add a 3-miss game over system with a local leaderboard where players enter their name after the match — top 10 saved locally for friendly competition
-* Refactor audio and UI responsibilities out of BallController into dedicated AudioManager and ScoreManager classes to improve separation of concerns
-* Show miss/save feedback text on screen (e.g. "SAVED!" or "WIDE!")
-* Add a visual drag indicator while aiming to help players understand shot direction and power
-* Add mobile touch input support
-* Add sound volume controls
+* Map legend — explain markers, tower icons, sector wedges, and heatmap gradient
+* Filter by caller — highlight one phone number's events across the map to trace individual movement
+* Timeline slider — filter by date to animate movement patterns across the 10-day window
+* Info panel — summary of total calls, unique callers, active towers, and date range
+* Basemap toggle — switch between street map and satellite imagery
 
 # AI Disclosure
-This project used AI assistance in the following ways:
-- Claude assisted with Unity Editor workflow — organizing assets, connecting GameObjects, configuring components, and understanding how Unity concepts like serialized fields, sprite swapping, and AudioSource work
-- ChatGPT generated all game art assets (background, goalkeeper sprites, ball)
+ 
+* Helped overlap 6-coordinate problem that drove the clustering decision.
+* Assisted with ArcGIS SDK setup, sector wedge geometry and jitter logic.
